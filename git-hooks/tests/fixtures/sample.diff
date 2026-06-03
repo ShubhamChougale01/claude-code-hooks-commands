@@ -1,0 +1,40 @@
+diff --git a/user_controller.py b/user_controller.py
+index a1b2c3d..e4f5g6h 100644
+--- a/user_controller.py
++++ b/user_controller.py
+@@ -42,7 +42,10 @@ class UserController:
+     def get_user(self, user_id):
+         conn = self.db.connect()
+         cursor = conn.cursor()
+-        cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
++        cursor.execute(f"SELECT * FROM users WHERE id={user_id}")
++        return cursor.fetchone()
++
++    def delete_all_users(self):
++        cursor.execute("DELETE FROM users")
+
+ diff --git a/order_service.py b/order_service.py
+index b2c3d4e..f5g6h7i 100644
+--- a/order_service.py
++++ b/order_service.py
+@@ -75,6 +75,10 @@ class OrderService:
+     def get_orders_with_items(self, orders):
+-        return db.query(Order).join(Item).all()
++        result = []
++        for order in orders:
++            items = db.query(Item).filter(Item.order_id == order.id).all()
++            result.append({**order.__dict__, "items": items})
++        return result
+
+diff --git a/utils.py b/utils.py
+index c3d4e5f..g6h7i8j 100644
+--- a/utils.py
++++ b/utils.py
+@@ -30,7 +30,8 @@ def process_payment(amount):
+     try:
+         return payment_gateway.charge(amount)
+-    except PaymentError as e:
+-        logger.error(f"Payment failed: {e}")
+-        raise
++    except Exception:
++        pass

@@ -1,0 +1,26 @@
+#!/bin/bash
+# Post-receive hook — runs on Git server after push is received
+# Rejects push if CRITICAL or HIGH issues are found
+# Usage: installed in /path/to/repo.git/hooks/post-receive
+
+PROJECT_DIR="/path/to/code-review-hooks"
+
+while read oldrev newrev refname; do
+    echo "Running code review for $refname..."
+    python3 "$PROJECT_DIR/src/run_review.py" \
+        --hook=post-receive \
+        --old="$oldrev" \
+        --new="$newrev" \
+        --ref="$refname"
+
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "╔══════════════════════════════════════════════╗"
+        echo "║  ❌ Push REJECTED by code review policy       ║"
+        echo "║  Fix CRITICAL/HIGH issues and push again.    ║"
+        echo "╚══════════════════════════════════════════════╝"
+        exit 1
+    fi
+done
+
+exit 0

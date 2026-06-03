@@ -1,0 +1,83 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x .claude/hooks/lib/common.sh .claude/hooks/pre_tool/*.sh .claude/hooks/post_tool/*.sh .claude/hooks/stop/*.sh)",
+      "Bash(npx tsc *)",
+      "Bash(uv run *)",
+      "Bash(python \"scripts/generate_dashboard.py\")"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/pre_tool/01_alembic_preflight.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/pre_tool/03_branch_protection.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/pre_tool/04_precommit_quality.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/pre_tool/02_migration_guard.sh\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/05_py_autoformat.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/06_ts_eslint_fix.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/07_ts_typecheck.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/08_model_schema_drift.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/09_migration_reminder.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/10_intent_action_sync.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/11_env_drift.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/12_dep_sync_reminder.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \".claude/hooks/post_tool/13_api_sync.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

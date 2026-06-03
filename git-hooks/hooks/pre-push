@@ -1,0 +1,9 @@
+#!/bin/bash
+# Pre-push hook — runs on developer machine before git push
+# Blocks push if CRITICAL or HIGH issues are found
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+python "$PROJECT_DIR/src/run_review.py" --hook=pre-push
+exit $?
